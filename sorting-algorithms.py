@@ -9,16 +9,26 @@ Interface.title("Sorting Algorithms")
 testCanvas = tkinter.Canvas(Interface,bg="gray",height=720,width=1080) #Creates the Canvas on which the bars will be drawn
 Interface.resizable(0,0) #Stops the window from being resized
 
-numvalues = 500 #The number of values that should be sorted
+numvalues = 50 #The number of values that should be sorted
 widthbar = 1080.0 / float(numvalues) #The width of one bar
 heightbar = 710.0 / float(numvalues) #the height of one value
 
-def draw(data,colored,color):
+changesperframe = 1 #How many changes should be made per frame. Allows for many values to be sorted in a reasonable amount of time
+numdraws = 0 #The amount of draws that were called. Everytime this is a multiple of changesperdraw, a frame is drawn.
+
+def draw(data,colored,color,forced = False):
     """
     Draws the given data to the screen. 
     The List (or tuple) "colored" contains the indecies that should not be colored in red, but in the given color "color".
     """
+    global numdraws #"Imports" global variable, because it will be changed
+    if (not forced and numdraws % changesperframe !=0): #If the draw is not forced and the number of draws is not a multiple of changesperframe:
+        numdraws+=1 #Only increment the counter
+        return #Return without drawing
+
     testCanvas.delete("all") #Clears the Canvas
+
+    numdraws+=1
 
     for i in range(numvalues): #Loops over all data
         localColor = "red"
@@ -36,6 +46,8 @@ def draw(data,colored,color):
     testCanvas.pack()
     Interface.update() #Updates the window to display the changes
 
+    time.sleep(0.01) #Sleeps for a short period of time to run at a reasonably speed
+
 def bubble(data):
     """
     A simple Implementation of the Bubblesort algorithm.
@@ -50,7 +62,6 @@ def bubble(data):
                 draw(data,(j,j+1),"yellow") #Draws the data both times, but in yellow if they were swapped
             else:
                 draw(data,(j,j+1),"blue") #Draws the values that were compared, but not swapped in blue
-            time.sleep(0.01) #Sleeps for a short period of time to run at a reasonably speed
 
 def insertion(data):
     """
@@ -62,10 +73,8 @@ def insertion(data):
                 data[j], data[j+1] = data[j+1], data[j]
 
                 draw(data, (j,j+1),"yellow") #Draw with yellow, because these two values were swapped.
-                time.sleep(0.01)
             else:
                 draw(data, (j,j+1),"blue") #Draw with blue, because the right place was found and nothing was changed
-                time.sleep(0.01)
                 break
 
 def selection(data):
@@ -82,19 +91,15 @@ def selection(data):
 
                 draw(data,(i,j),"yellow") #Draws with yellow, because the data changed
 
-                time.sleep(0.01)
                 break
             else: #If the value is not yet low enough, continue
                 draw (data,(i,j),"blue") #Draw with blue, because nothing changed
-                time.sleep(0.01)
         else: #If the value was not able to be inserted anywhere in the already sorted list
             temp = data[i]
             del data[i]
             data.insert(0,temp) #Put the value at i to the beginning
 
             draw(data,(i,0),"yellow") #Draw with yellow, because the data changed
-
-            time.sleep(0.01)
 
 
 givenList = list(range(numvalues)) #Generates a list from 0 to 99, inclusive
@@ -116,5 +121,5 @@ try:
 except tkinter.TclError: #If the User closes the window, stop the program so it doesn't throw an error.
      exit()
 
-draw(givenList,(givenList),"green") #At the end, draw the entire list in green because it's sorted
+draw(givenList,(givenList),"green",True) #At the end, draw the entire list in green because it's sorted
 Interface.mainloop() #Doesn't close the window when it's done
