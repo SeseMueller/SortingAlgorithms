@@ -9,6 +9,10 @@ Interface.title("Sorting Algorithms")
 testCanvas = tkinter.Canvas(Interface,bg="gray",height=720,width=1080) #Creates the Canvas on which the bars will be drawn
 Interface.resizable(0,0) #Stops the window from being resized
 
+numvalues = 500 #The number of values that should be sorted
+widthbar = 1080.0 / float(numvalues) #The width of one bar
+heightbar = 710.0 / float(numvalues) #the height of one value
+
 def draw(data,colored,color):
     """
     Draws the given data to the screen. 
@@ -16,17 +20,17 @@ def draw(data,colored,color):
     """
     testCanvas.delete("all") #Clears the Canvas
 
-    for i in range(100): #Loops over all data
+    for i in range(numvalues): #Loops over all data
         localColor = "red"
 
         if i in colored: #If the special color should be used, apply it
             localColor = color
         
         #Calculates the positions of the bars 
-        x1= i*10.8 
-        x2= i*10.8 +10.8
+        x1= i * widthbar 
+        x2= (i+1) * widthbar
         y1= 720
-        y2= 715 - data[i]*7.2
+        y2= 715 - data[i]*heightbar
         rect = testCanvas.create_rectangle((x1,y1,x2,y2),fill=localColor) #Draws the bars in their corresponding colors
 
     testCanvas.pack()
@@ -93,7 +97,7 @@ def selection(data):
             time.sleep(0.01)
 
 
-givenList = list(range(100)) #Generates a list from 0 to 99, inclusive
+givenList = list(range(numvalues)) #Generates a list from 0 to 99, inclusive
 for i in range(len(givenList)): #Shuffles this list
     chosen = random.randint(i,len(givenList)-1)
     givenList[i] , givenList[chosen] = givenList[chosen] , givenList[i]
