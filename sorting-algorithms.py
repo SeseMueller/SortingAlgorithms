@@ -9,11 +9,11 @@ Interface.title("Sorting Algorithms")
 testCanvas = tkinter.Canvas(Interface,bg="gray",height=720,width=1080) #Creates the Canvas on which the bars will be drawn
 Interface.resizable(0,0) #Stops the window from being resized
 
-numvalues = 50 #The number of values that should be sorted
+numvalues = 500 #The number of values that should be sorted
 widthbar = 1080.0 / float(numvalues) #The width of one bar
 heightbar = 710.0 / float(numvalues) #the height of one value
 
-changesperframe = 1 #How many changes should be made per frame. Allows for many values to be sorted in a reasonable amount of time
+changesperframe = 10 #How many changes should be made per frame. Allows for many values to be sorted in a reasonable amount of time
 numdraws = 0 #The amount of draws that were called. Everytime this is a multiple of changesperdraw, a frame is drawn.
 
 def draw(data,colored,color,forced = False):
@@ -101,6 +101,49 @@ def selection(data):
 
             draw(data,(i,0),"yellow") #Draw with yellow, because the data changed
 
+def merge(indecies):
+    """
+    A simple, recursive Implementation of the mergesort algorithm.
+    """
+    global givenList
+
+    if len(indecies) == 1: #If there is only one element, the list is sorted
+        return
+    
+    merge(indecies[len(indecies)//2:]) #mergesorts the first and second half of the list
+    merge(indecies[:len(indecies)//2])
+    firsthalf = indecies[len(indecies)//2:] #stores the halfs in the two variables
+    secondhalf = indecies[:len(indecies)//2]
+
+    temparray = [] #stores the indicies in sorted order
+
+    while len(firsthalf) != 0 and len(secondhalf) != 0: #While both halfs still contain elements, take the first element from the list, which first element is lower
+        if(givenList[firsthalf[0]]<givenList[secondhalf[0]]):
+            temparray.append(firsthalf[0])
+            draw (givenList,[firsthalf[0]],"blue")
+            del firsthalf[0]
+        else:
+            temparray.append(secondhalf[0])
+            draw(givenList,[secondhalf[0]],"blue")
+            del secondhalf[0]
+    
+    #After this, one of the lists still contain elements. These are now added to temparray
+    for i in range(len(firsthalf)):
+        temparray.append(firsthalf[i])
+        draw(givenList,[firsthalf[i]],"blue")
+    
+    for i in range(len(secondhalf)):
+        temparray.append(secondhalf[i])
+        draw(givenList,[secondhalf[i]],"blue")
+
+    temp = [givenList[i] for i in temparray] #Stores the values temporarily to not change the givenList
+
+    for i in range(len(temp)): #Set all values that were supposed to be sorted to themselves in the sorted order
+        givenList[indecies[0]+i] = temp[i]
+        draw(givenList,[indecies[0]+i],"yellow")
+
+    return 
+
 
 givenList = list(range(numvalues)) #Generates a list from 0 to 99, inclusive
 for i in range(len(givenList)): #Shuffles this list
@@ -115,8 +158,9 @@ try:
     #Executes one of the algorithms
 
     #bubble(givenList) 
-    selection(givenList) 
+    #selection(givenList) 
     #insertion(givenList) 
+    merge(list(range(len(givenList))))
 
 except tkinter.TclError: #If the User closes the window, stop the program so it doesn't throw an error.
      exit()
