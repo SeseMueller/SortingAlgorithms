@@ -144,6 +144,34 @@ def merge(indecies):
 
     return 
 
+def quick(indecies):
+    """
+    A simple recursive implementation of the quicksort algorithm.
+    """
+
+    if(len(indecies)==1 or len(indecies)==0): #If the list only contains one or zero elements, it is already sorted
+        return
+
+    pivot = indecies[-1] #The pivot point with which everything is compared
+
+    lowerhalf = [i for i in indecies if (givenList[i]<=givenList[pivot] and i != pivot)] #Finds the lower and upper half of the list by comparing with the pivot
+    upperhalf = [i for i in indecies if (givenList[i]>givenList[pivot])]
+
+
+    temp = lowerhalf + [pivot] + upperhalf 
+    temparray = [givenList[i] for i in temp]
+
+    for i in range(len(temparray)): #Sets the part of the list that was given to the semi-sorted verion one value at a time
+        givenList[indecies[i]] = temparray[i]
+        draw(givenList,[indecies[i]],"yellow")
+    
+    #Now the List contains first all values < pivot, the pivot, and then all values > pivot. The bounds of the lower and upper section are determined
+    lowerhalf = list(range(indecies[0],indecies[0]+len(lowerhalf)))
+    upperhalf = list(range(indecies[0]+len(lowerhalf),indecies[-1]+1))
+    quick(lowerhalf) #Calls the function on the two halves
+    quick(upperhalf)
+    
+    return
 
 givenList = list(range(numvalues)) #Generates a list from 0 to 99, inclusive
 for i in range(len(givenList)): #Shuffles this list
@@ -160,7 +188,8 @@ try:
     #bubble(givenList) 
     #selection(givenList) 
     #insertion(givenList) 
-    merge(list(range(len(givenList))))
+    #merge(list(range(len(givenList))))
+    quick(list(range(len(givenList))))
 
 except tkinter.TclError: #If the User closes the window, stop the program so it doesn't throw an error.
      exit()
