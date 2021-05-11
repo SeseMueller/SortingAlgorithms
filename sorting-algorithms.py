@@ -16,6 +16,11 @@ heightbar = 710.0 / float(numvalues) #the height of one value
 changesperframe = 10 #How many changes should be made per frame. Allows for many values to be sorted in a reasonable amount of time
 numdraws = 0 #The amount of draws that were called. Everytime this is a multiple of changesperdraw, a frame is drawn.
 
+allrects = [None for i in range(numvalues)] #A list to contain all rectangles for it to not be needed to recreate all rectangles once a frame has been drawn
+
+for i in range(numvalues): #Creates all rectangles as placeholders
+    allrects[i] = testCanvas.create_rectangle((i*widthbar,0,(i+1)*widthbar,1),width=0)
+
 def draw(data,colored,color,forced = False):
     """
     Draws the given data to the screen. 
@@ -25,8 +30,6 @@ def draw(data,colored,color,forced = False):
     if (not forced and numdraws % changesperframe !=0): #If the draw is not forced and the number of draws is not a multiple of changesperframe:
         numdraws+=1 #Only increment the counter
         return #Return without drawing
-
-    testCanvas.delete("all") #Clears the Canvas
 
     numdraws+=1
 
@@ -41,7 +44,22 @@ def draw(data,colored,color,forced = False):
         x2= (i+1) * widthbar
         y1= 720
         y2= 715 - data[i]*heightbar
-        rect = testCanvas.create_rectangle((x1,y1,x2,y2),fill=localColor) #Draws the bars in their corresponding colors
+        #Only if the rectangles coordinate do not match the previous iteration's rectangles coordinates, create a new one. 
+        #Changing the coordinates of already existing rectangles doesn't seem possible.
+        
+        redrawrectangle = ((testCanvas.coords(allrects[i])!=[x1,y2,x2,y1]) #Draws a new rectangle if the coordinates changed,
+        or forced ) #Or when the redraw is forced, for example at the end, when the result needs to be drawn.
+        
+        updatecolor = ( testCanvas.itemcget(allrects[i],"fill")=="yellow" #If the color is yellow or blue, it needs it's color to be updated.
+        or testCanvas.itemcget(allrects[i],"fill")=="blue" 
+        or localColor != "red") #If the value was only read, it also needs to be color updated to signal that it was read.
+
+        if(redrawrectangle): #Only if the redraw is needed
+            testCanvas.delete(allrects[i]) #Delete the old rectangle
+            allrects[i] = testCanvas.create_rectangle((x1,y1,x2,y2),fill = localColor) #Draws a new rectangle with the correct coordinates and adds it to allrects
+
+        if(updatecolor):
+            testCanvas.itemconfigure(allrects[i],fill = localColor)
 
     testCanvas.pack()
     Interface.update() #Updates the window to display the changes
